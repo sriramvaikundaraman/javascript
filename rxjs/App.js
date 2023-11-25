@@ -8,7 +8,7 @@ console.log(a);
 const observer = {
     next : (value)=> console.log("Next", value),
     error: (value) => console.log("Error", value),
-    completed:()=>console.log(completed)
+    complete:()=>console.log(completed)
 }
 
 a.subscribe(observer);
