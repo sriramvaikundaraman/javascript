@@ -150,3 +150,9 @@ cat.sayHelloCat();
 
 
 console.log(cat.title, dog.title);
+
+
+Bird.prototype.sayName = function(){
+    console.log("Iam a bird", this.name);
+}
+parrot.sayName()
