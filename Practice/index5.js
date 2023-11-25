@@ -18,7 +18,7 @@ Animal.prototype.sayHello = function() {
 };
 
 Bird.prototype.sayName = function(){
-    console.log("Iam a bird ", this.name);
+    console.log("Iam a bird", this.name);
 }
 
 Animal.prototype.title = "Animal";
