@@ -1,0 +1,374 @@
+1. ngOnChanges: When the value of a data bound property changes, then this method is called.
+2. ngOnInit: This is called whenever the initialization of the directive/component after Angular first displays the data-bound properties happens.
+3. ngDoCheck: This is for the detection and to act on changes that Angular can't or won't detect on its own.
+4. ngAfterContentInit: This is called in response after Angular projects external content into the component's view.
+5. ngAfterContentChecked: This is called in response after Angular checks the content projected into the component.
+6. ngAfterViewInit: This is called in response after Angular initializes the component's views and child views.
+7. ngAfterViewChecked: This is called in response after Angular checks the component's views and child views.
+8. ngOnDestroy: This is the cleanup phase just before Angular destroys the directive/component.
+
+
+
+1. ngOnChanges
+---------------
+
+ngOnChanges is called whenever Angular detects changes to "input" properties of the component or directive.
+It is not called for changes that occur within the component itself, such as changes to properties that are not bound to external data.
+
+HeaderComponent:
+----------------
+
+export class HeaderComponent implements OnChanges {
+  @Input() myInput!:string;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if('myInput' in changes){
+      console.log("Changed", this.myInput);
+    }
+}
+}
+
+Header HTML
+-----------
+<p>{{myInput}}'s header works!</p>
+
+
+AppComponent
+------------
+export class AppComponent {
+  name = "Sriram";
+}
+
+AppComponent HTML
+-----------------
+<input type="text" id="input-box" [(ngModel)]="name" placeholder="Enter any text" />
+
+
+SimpleChanges Object:
+----------------------
+The SimpleChanges object passed to ngOnChanges provides information about each changed property.
+It is a dictionary where the keys are the names of the properties that changed, and the values are instances of SimpleChange class.
+
+
+SimpleChange Object:
+---------------------
+The SimpleChange class contains information about a changed property.
+It has properties like previousValue (the previous value of the property), currentValue (the new value of the property), and a method isFirstChange() to check if the change is the first change since the component was created.
+
+Example:
+---------
+
+myInput: SimpleChange
+currentValue: "Sriramss"
+firstChange: false
+previousValue: "Srirams"
+
+
+
+
+
+
+
+
+
+2. ngOnInit
+-----------
+This is called whenever the initialization of the directive/component after Angular first displays the data-bound properties happens.
+In other words, In Angular, ngOnInit is a lifecycle hook that is called after Angular has initialized all the data-bound properties (input) of a component. It's one of the Angular lifecycle hooks and is commonly used for initialization logic.
+
+***Initialization:
+
+ngOnInit is called after Angular has set up the component's input properties with the initial values.
+It is a good place to perform component initialization tasks, such as fetching data from a server, initializing variables, or setting up subscriptions.
+
+
+***Single Invocation:
+
+ngOnInit is called only once for the lifecycle of the component.
+It is invoked after the component has been created and after the first ngOnChanges hook if there are any data-bound input properties.
+
+***Access to Input Properties:
+
+While ngOnInit is a good place to perform initialization, it's important to note that the input properties might not be available inside the constructor. They are set before ngOnInit is called. (ngOnChanges is responsible to set input properties)
+
+it's generally a good practice to keep it lightweight. Heavy operations might impact the initial rendering of the component.
+
+Example:
+
+export class HeaderComponent implements OnChanges,OnInit {
+  @Input() myInput!:string;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if('myInput' in changes){
+      console.log("Changed", this.myInput);
+    }
+  }
+
+  ngOnInit(): void {
+    console.log("Init done for header");
+  }
+
+}
+
+Output
+------
+Changed Sri
+Init done for header
+
+
+
+
+
+
+
+
+
+
+3. ngDoCheck:
+--------------
+This is for the detection and to act on changes that Angular can't or won't detect on its own.
+Unlike ngOnInit and ngOnChanges, which are specific to certain stages of the component lifecycle, ngDoCheck is more flexible and allows developers to implement custom change detection logic
+
+Manual Change Detection:
+
+While Angular automatically performs change detection for components, sometimes there are scenarios where you need more control over when and how change detection is performed. ngDoCheck allows you to implement custom change detection logic
+
+
+Frequent Invocations:
+
+ngDoCheck is called whenever Angular checks for changes in the component and its children. It can be invoked quite frequently, so it's important to keep the implementation efficient.
+
+
+Pairing with ChangeDetectorRef:
+
+Developers often use ngDoCheck in conjunction with ChangeDetectorRef to manually trigger change detection when needed. ChangeDetectorRef provides methods like markForCheck and detectChanges to signal that a change has occurred.
+
+Comparing Previous and Current State:
+
+Within ngDoCheck, you can compare the previous state of the component with the current state and take actions accordingly. This is useful for scenarios where Angular's default change detection might not be sufficient.
+
+export class HeaderComponent implements DoCheck {
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if('myInput' in changes){
+      console.log("Changed", this.myInput);
+    }
+  }
+}
+
+Output:
+-------
+
+Docheck along with it's data is printed 3 times in this case. 
+
+Note: DoCheck will be invoked even if parent component changes and also for structural detectives like ngFor and ngIf is invoked
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. ngAfterContentInit
+----------------------
+
+First Understand Parent Projection
+
+AppComponent.html
+------------------
+
+<app-header>
+
+  <p #projectedContent>This is some content projected from the parent component.</p>
+
+</app-header>
+
+
+HeaderComponent.html
+---------------------
+
+<div>
+    <ng-content></ng-content>
+</div>
+
+
+HeaderComponent
+---------------
+
+  @ContentChild('projectedContent') projectedContent!: ElementRef;
+    ngAfterContentInit(): void {
+     console.log("ngAfterContentInit", this.projectedContent);
+  }
+
+
+So ng-content will display the contents of p tag present inbetween app-header
+
+In Angular, a component can include content from its parent component by using the <ng-content></ng-content> tag. This is known as content projection. The ngAfterContentInit lifecycle hook is a special function that you can define in your component. Angular will automatically call this function at a specific time during the component's life.
+
+So, ngAfterContentInit is like a callback that tells your component, "Hey, your content is all set now. Do anything special you need to do with it." This is useful if you want to perform some logic or setup based on the content that was projected into your component.
+
+
+Initialization After Content Projection:
+
+ngAfterContentInit is called after Angular has finished projecting content into the component. This includes content projected using the <ng-content> directive in the component's template.
+
+Access to Projected Content:
+
+Inside the ngAfterContentInit method, you have access to the content projected into the component. You can query for and interact with this content using Angular's ContentChild or ContentChildren decorators.
+
+
+Single Invocation:
+
+Like other lifecycle hooks, ngAfterContentInit is called only once during the lifecycle of a component.
+
+
+
+
+5. ngAfterContentChecked:
+-------------------------
+
+ngAfterContentChecked is a lifecycle hook in Angular that is called after Angular has checked the content that is projected into a component. This hook is part of the component lifecycle and is triggered after each round of change detection that occurs for the content projected into the component.
+
+
+Timing:
+
+ngAfterContentChecked is called after Angular has checked the content projected into the component.
+It is triggered during each change detection cycle, specifically after the content has been checked for changes.
+
+Use Case:
+
+This hook is useful when you need to perform actions or logic that should happen after the content projected into the component has been checked for changes
+
+Access to Projected Content:
+
+Inside the ngAfterContentChecked method, you have access to the content projected into the component. You can query and interact with this content using Angular's ContentChild or ContentChildren decorators.
+Frequent Invocations:
+
+Be mindful that ngAfterContentChecked can be called frequently, so it's important to keep the implementation efficient to avoid performance issues.
+
+export class ExampleComponent implements AfterContentChecked {
+  @ContentChild('projectedContent') projectedContent: ElementRef;
+
+  ngAfterContentChecked(): void {
+    if (this.projectedContent) {
+      console.log('Content has been checked:', this.projectedContent.nativeElement.innerHTML);
+    }
+  }
+}
+
+
+
+
+6. ngAfterViewInit:
+--------------------
+
+
+ngAfterViewInit is a lifecycle hook in Angular that is called after Angular has initialized the component's view and the views of its child components. This hook is part of the component lifecycle and is triggered once the component's template has been fully rendered and the corresponding DOM elements are available
+
+
+HeaderComponent.html
+--------------------
+<div #viewElement>
+    This is the view element.
+</div>
+
+
+HeaderComponent ts
+--------------------
+
+export class HeaderComponent implements OnViewInit{
+	@ViewChild('viewElement') childDiv!: ElementRef;
+
+	ngAfterViewInit(): void {
+      console.log("ngAfterViewInit", "View DIV of header", this.childDiv.nativeElement.innerHTML);
+  }
+
+}
+
+
+Timing:
+
+ngAfterViewInit is called after Angular has fully initialized the component's view, including the views of its child components.
+It is triggered once the component's template has been processed, and the corresponding DOM elements are available for manipulation.
+
+Use Case:
+
+This hook is useful when you need to perform actions or logic that should happen after the component's view has been initialized. It's commonly used for DOM manipulations, such as accessing and interacting with the rendered elements.
+
+Access to View Elements:
+
+Inside the ngAfterViewInit method, you have access to the component's view and can use @ViewChild or @ViewChildren decorators to query and interact with elements in the view.
+Single Invocation:
+
+ngAfterViewInit is called only once during the lifecycle of the component, after the view has been initialized. It won't be called again unless the component is destroyed and recreated.
+
+
+7. ngAfterViewChecked:
+----------------------
+
+
+ngAfterViewChecked is a lifecycle hook in Angular that is called after Angular has checked the component's view and the views of its child components. This hook is part of the component lifecycle and is triggered after each round of change detection that occurs for the component's view.
+
+Here is the example of the ngAfterViewChecked method:
+
+import { Component, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  template: `
+    <div #viewElement>
+      This is the view element.
+    </div>
+  `,
+})
+export class ExampleComponent implements AfterViewChecked {
+  @ViewChild('viewElement') viewElement: ElementRef;
+
+  ngAfterViewChecked(): void {
+    // This function is automatically called by Angular
+    // after the component's view has been checked.
+    if (this.viewElement) {
+      console.log('View element content:', this.viewElement.nativeElement.innerHTML);
+    }
+  }
+}
+
+
+Timing:
+
+ngAfterViewChecked is called after Angular has checked the component's view and the views of its child components.
+It is triggered during each change detection cycle, specifically after the component's view has been checked for changes.
+Use Case:
+
+This hook is useful when you need to perform actions or logic that should happen after the component's view has been checked for changes. It's commonly used for tasks that depend on the state of the view after change detection.
+Access to View Elements:
+
+Inside the ngAfterViewChecked method, you have access to the component's view, and you can use @ViewChild or @ViewChildren decorators to query and interact with elements in the view.
+Frequent Invocations:
+
+Be mindful that ngAfterViewChecked can be called frequently, as it is triggered after each change detection cycle. Ensure that the implementation is efficient to avoid performance issues.
+
+
+8. ngOnDestroy
+----------------
+ngOnDestroy is a lifecycle hook in Angular that is called just before a component is destroyed or removed from the DOM. This hook provides an opportunity to clean up resources, unsubscribe from observables, or perform any necessary cleanup tasks before the component is no longer in use.
+
+Cleanup Operations:
+
+This hook is commonly used to perform cleanup operations such as unsubscribing from observables, cancelling timers, releasing resources, or anything else that needs to be cleaned up before the component is destroyed.
+Unsubscribe from Observables:
+
+If your component subscribes to observables, it's a good practice to unsubscribe from them in the ngOnDestroy method to prevent memory leaks.
+
+Cleaning Up Resources:
+
+If your component has acquired resources that need to be released, such as closing connections or freeing up memory, ngOnDestroy is the appropriate place to do so.
+Single Invocation:
+
+ngOnDestroy is called only once during the lifecycle of the component, just before the component is destroyed.

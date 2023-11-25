@@ -33,7 +33,7 @@ const firstName = 'Sriram';
 const output1 = firstName;
 console.log(output1, typeof output1);
 
-age = 30;
+let age = 30;
 const output2 = age;
 console.log(output2, typeof output2);
 
@@ -53,7 +53,7 @@ console.log(output5, typeof output5)
 const output6 = undefined;
 
 const id = Symbol('myid');
-console.log(id)
+console.log("Symbol",id)
 
 const n = 13874987498498n;
 console.log(n, typeof n)
@@ -103,8 +103,8 @@ console.log(1+NaN)
 /* Strings */
 let x;
 const myName = 'Sriram';
-const age =24;
-x = 'hello, my name is '+myName +' '+ 'and my age is ' + age;
+const myAge =24;
+x = 'hello, my name is '+myName +' '+ 'and my age is ' + myAge;
 console.log(x)
 
 // using template literals
